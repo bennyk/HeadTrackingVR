@@ -16,7 +16,12 @@
  * =====================================================================================
  */
 
-#include "glfw_app.hpp"
+#include <EGL/egl.h> // requires ndk r5 or newer
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+
+//#include "glfw_app.hpp"
+#include "gl_app.hpp"
 #include "gl_shader.hpp"
 #include "gl_macros.hpp"
 
@@ -31,7 +36,7 @@ using namespace lynda;
 /*-----------------------------------------------------------------------------
  *  SHADER CODE
  *-----------------------------------------------------------------------------*/
-const char * vert = GLSL(120, 
+const char * vert = GLSL(100,
   
   attribute vec4 position;
   attribute vec4 color;
@@ -49,9 +54,9 @@ const char * vert = GLSL(120,
 
 );
 
-const char * frag = GLSL(120,
+const char * frag = GLSL(100,
   
-  varying vec4 dstColor;
+  varying lowp vec4 dstColor;
    
   void main(){
     gl_FragColor = dstColor;
@@ -72,7 +77,7 @@ struct Vertex{
 /*-----------------------------------------------------------------------------
  *  OUR APP
  *-----------------------------------------------------------------------------*/
-struct MyApp : public App{
+struct ModelApp : public MyGlApp{
 
   Shader * shader;
   //ID of Vertex Attribute
@@ -85,15 +90,19 @@ struct MyApp : public App{
   GLuint modelID, viewID, projectionID;
 
   //Constructor (initialize application)
-  MyApp() : App() { init(); }
+  ModelApp() : MyGlApp() { }
+  ~ModelApp() {}
 
-  void init(){
+  virtual bool initialize(){
+	MyGlApp::initialize();
+
+	LOG_INFO("initializing ModelApp");
 
     //Specify the 3 VERTICES of A Triangle
     Vertex triangle[] = {
-      { glm::vec2(-1,0), glm::vec4(1,0,0,1) },               
-      { glm::vec2(0,1),  glm::vec4(0,1,0,1) }, 
-      { glm::vec2(1,0),  glm::vec4(0,0,1,1) } 
+      { glm::vec2(-1,0), glm::vec4(1,0,0,1) },
+      { glm::vec2(0,1),  glm::vec4(0,1,0,1) },
+      { glm::vec2(1,0),  glm::vec4(0,0,1,1) }
     };
 
 
@@ -125,7 +134,6 @@ struct MyApp : public App{
     // Send data over buffer to GPU
     glBufferData( GL_ARRAY_BUFFER, 3 * sizeof(Vertex), triangle, GL_STATIC_DRAW );
 
-
     /*-----------------------------------------------------------------------------
      *  ENABLE VERTEX ATTRIBUTES
      *-----------------------------------------------------------------------------*/
@@ -141,10 +149,15 @@ struct MyApp : public App{
     BINDVERTEXARRAY(0);
     glBindBuffer( GL_ARRAY_BUFFER, 0);
 
+    return true;
+
   }
 
 
-  void onDraw(){
+  virtual void onDraw(){
+
+      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     static float time = 0.0;
     time += .01;
@@ -163,7 +176,8 @@ struct MyApp : public App{
      *  Projection Transform:  Field of View     Ratio                     Near   Far
      *-----------------------------------------------------------------------------*/
      // glm requires us to use floats!  use .f or else you'll get compiler errors
-    glm::mat4 proj = glm::perspective( PI / 3.0f, (float)window().ratio(), 0.1f,-10.0f);
+    float ratio = ANativeWindow_getWidth(window()) / ANativeWindow_getHeight(window());
+    glm::mat4 proj = glm::perspective( PI / 3.0f, ratio, 0.1f,-10.0f);
   
     /*-----------------------------------------------------------------------------
      *  Send view and projection matrices to Shader Uniforms
@@ -196,7 +210,7 @@ struct MyApp : public App{
 
 };
 
-
+/*
 int main(int argc, const char ** argv){
  
   MyApp app;
@@ -204,6 +218,7 @@ int main(int argc, const char ** argv){
        
   return 0;
 }
+*/
 
 
 

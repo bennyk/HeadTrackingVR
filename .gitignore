@@ -5,3 +5,8 @@
 /build
 
 *.swp
+.cproject
+.project
+jniproject/libs
+jniproject/lib
+jniproject/obj

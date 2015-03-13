@@ -16,8 +16,15 @@
  * =====================================================================================
  */
 
+#include <EGL/egl.h> // requires ndk r5 or newer
+#include <GLES2/gl2.h>
+#include <iostream>
+
+#include "logger.h"
 
 namespace lynda {
+
+//using namespace std;
 
     class Shader {
         
@@ -76,10 +83,16 @@ namespace lynda {
         glGetShaderiv(ID, GL_COMPILE_STATUS, &comp);
 
         if(comp == GL_FALSE ){
-            cout << "Shader Compilation FAILED" << endl;
+//            cout << "Shader Compilation FAILED" << endl;
+        	LOG_INFO("Shader Compilation FAILED");
             GLchar messages[256];
             glGetShaderInfoLog(ID, sizeof(messages),0,&messages[0]);
-            cout << messages;
+//            cout << messages;
+            LOG_INFO("%s", messages);
+        }
+        else {
+//        	cout << "shader compile ok" << endl;
+        	LOG_INFO("Shader compiles okay.");
         }
       }
 
@@ -93,21 +106,27 @@ namespace lynda {
             
 
         if(linkStatus == GL_FALSE ){
-            cout << "Shader Linking FAILED" << endl;
+//            cout << "Shader Linking FAILED" << endl;
+        	LOG_INFO("Shader Linking FAILED");
             GLchar messages[256];
             glGetProgramInfoLog(ID, sizeof(messages),0,&messages[0]);
-            cout << messages;
+//            cout << messages;
+            LOG_INFO("%s", messages);
         }
 
         glValidateProgram(ID);
         glGetProgramiv(ID, GL_VALIDATE_STATUS, &validateStatus);
           
-        cout << "Link: " << linkStatus << "  Validate: " << validateStatus << endl; 
+//        cout << "Link: " << linkStatus << "  Validate: " << validateStatus << endl;
+        LOG_INFO("Link: %d Validate: %d", linkStatus, validateStatus);
+
         if(linkStatus == GL_FALSE ){
-            cout << "Shader Validation FAILED" << endl;
+//            cout << "Shader Validation FAILED" << endl;
+        	LOG_INFO("Shader Validation FAILED");
             GLchar messages[256];
             glGetProgramInfoLog(ID, sizeof(messages),0,&messages[0]);
-            cout << messages;
+//            cout << messages;
+            LOG_INFO("%s", messages);
         }
 
       }

@@ -40,6 +40,7 @@ namespace lynda{
 #define RAND (1.0 * rand() / (RAND_MAX))
 #endif
 
+/*
 #ifndef GENVERTEXARRAYS
 #define GENVERTEXARRAYS(n,id) if(GLEW_APPLE_vertex_array_object)glGenVertexArraysAPPLE(1,id);\
 	else if (GLEW_ARB_vertex_array_object) glGenVertexArrays(n,id)
@@ -49,6 +50,11 @@ namespace lynda{
 #define BINDVERTEXARRAY(id) if(GLEW_APPLE_vertex_array_object)glBindVertexArrayAPPLE(id);\
 	else if (GLEW_ARB_vertex_array_object) glBindVertexArray(id)
 #endif
+*/
+
+// for Android
+#define GENVERTEXARRAYS(n,id) glGenVertexArraysOES(n,id)
+#define BINDVERTEXARRAY(id) glBindVertexArrayOES(id)
 
 }
 
