@@ -10,9 +10,9 @@
 #include "gl_app.hpp"
 #include "examples/Model.hpp"
 #include "examples/NullApp.hpp"
+#include "examples/Cube.hpp"
 
 #define LOG_TAG "jniapi"
-
 
 static ANativeWindow *window = 0;
 static MyGlApp *myapp = 0;
@@ -20,8 +20,9 @@ static MyGlApp *myapp = 0;
 JNIEXPORT void JNICALL Java_com_bennykhoo_vr_headtrackingvr_MainActivity_nativeOnStart(JNIEnv* jenv, jobject obj)
 {
     LOG_INFO("nativeOnStart");
-    myapp = new ModelApp();
+//    myapp = new ModelApp();
 //    myapp = new NullApp();
+    myapp = new cubeapp::CubeApp();
     return;
 }
 
@@ -59,6 +60,11 @@ JNIEXPORT void JNICALL Java_com_bennykhoo_vr_headtrackingvr_MainActivity_nativeS
     }
 
     return;
+}
+
+JNIEXPORT void JNICALL Java_com_bennykhoo_vr_headtrackingvr_MainActivity_nativeSetLookAtAngles(JNIEnv* jenv, jobject obj, jfloat azimuth, jfloat pitch, jfloat roll)
+{
+	myapp->setLookAtAngles(azimuth, pitch, roll);
 }
 
 

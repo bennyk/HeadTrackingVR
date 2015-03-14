@@ -16,6 +16,9 @@
  * =====================================================================================
  */
 
+#ifndef GL_SHADER_HPP
+#define GL_SHADER_HPP
+
 #include <EGL/egl.h> // requires ndk r5 or newer
 #include <GLES2/gl2.h>
 #include <iostream>
@@ -138,3 +141,5 @@ namespace lynda {
 
 
 } //lynda::
+
+#endif

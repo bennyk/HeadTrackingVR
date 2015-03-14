@@ -34,6 +34,8 @@ struct MyGlApp {
     EGLSurface _surface;
     EGLContext _context;
 
+    float _lookAtAngles[3];
+
     MyGlApp() : _msg(MSG_NONE), _display(0), _surface(0), _context(0), _window(0)
     {
         LOG_INFO("Renderer instance created");
@@ -292,6 +294,13 @@ struct MyGlApp {
         LOG_INFO("base init() done.");
 
         return true;
+    }
+
+    void setLookAtAngles(float azimuth, float pitch, float roll)
+    {
+    	_lookAtAngles[0] = azimuth;
+    	_lookAtAngles[1] = pitch;
+    	_lookAtAngles[2] = roll;
     }
 
     virtual void onDraw() = 0;
