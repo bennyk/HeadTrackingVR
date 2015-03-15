@@ -16,6 +16,39 @@
 
 #define LOG_TAG "MyGlApp"
 
+
+enum ChannelTag { LEFT_CHANNEL, RIGHT_CHANNEL, SINGLE_CHANNEL };
+
+struct ParcelInfo {
+	EGLint x, y, width, height;
+	ChannelTag tag;
+	uint halfIPDDistancePx;
+
+	ParcelInfo() : x(0), y(0), width(0), height(0), tag(SINGLE_CHANNEL), halfIPDDistancePx(0)
+	{}
+
+	ParcelInfo(EGLint x, EGLint y, EGLint width, EGLint height, ChannelTag tag)
+	: x(x), y(y), width(width), height(height), tag(tag), halfIPDDistancePx(0) {
+
+		// init a safe default
+		halfIPDDistancePx = width/2;
+	}
+
+	float getHalfIPDOffsetRatio() {
+		if (tag == LEFT_CHANNEL)
+			return - (float) halfIPDDistancePx / width ;
+		else if (tag == RIGHT_CHANNEL)
+			return (float) halfIPDDistancePx / width ;
+		else
+			return 0.0f;
+	}
+
+	float aspectRatio() {
+		return (float)width/height;
+	}
+
+};
+
 struct MyGlApp {
     enum RenderThreadMessage {
         MSG_NONE = 0,
@@ -36,7 +69,10 @@ struct MyGlApp {
 
     float _lookAtAngles[3];
 
-    MyGlApp() : _msg(MSG_NONE), _display(0), _surface(0), _context(0), _window(0)
+    ParcelInfo _leftChannel, _rightChannel;
+    bool stereoMode;
+
+    MyGlApp() : _msg(MSG_NONE), _display(0), _surface(0), _context(0), _window(0), stereoMode(true)
     {
         LOG_INFO("Renderer instance created");
         pthread_mutex_init(&_mutex, 0);
@@ -140,9 +176,17 @@ struct MyGlApp {
             _msg = MSG_NONE;
 
             if (_display) {
-//                setViewport();
 
-                onDraw();
+                glViewport(_leftChannel.x, _leftChannel.y, _leftChannel.width, _leftChannel.height);
+                glScissor(_leftChannel.x, _leftChannel.y, _leftChannel.width, _leftChannel.height);
+                onDraw(_leftChannel);
+
+                if (stereoMode) {
+                	glViewport(_rightChannel.x, _rightChannel.y, _rightChannel.width, _rightChannel.height);
+                	glScissor(_rightChannel.x, _rightChannel.y, _rightChannel.width, _rightChannel.height);
+                	onDraw(_rightChannel);
+                }
+
                 if (!eglSwapBuffers(_display, _surface)) {
                     LOG_ERROR("eglSwapBuffers() returned error %d", eglGetError());
                 }
@@ -277,6 +321,7 @@ struct MyGlApp {
 
         LOG_INFO("set viewport width %d height %d", width, height);
         glViewport(0, 0, width, height);
+        glEnable(GL_SCISSOR_TEST);
 
 //        ratio = (GLfloat) width / height;
 //        glMatrixMode(GL_PROJECTION);
@@ -288,6 +333,16 @@ struct MyGlApp {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        if (stereoMode) {
+            // setup stereoscopic mode
+        	_leftChannel = ParcelInfo(0, 0, width/2, height, LEFT_CHANNEL);
+        	_rightChannel = ParcelInfo(width/2, 0, width/2, height, RIGHT_CHANNEL);
+        } else {
+        	// only _leftChannel is rendered but we defined the right anyway.
+        	_leftChannel = ParcelInfo(0, 0, width, height, SINGLE_CHANNEL);
+        	_rightChannel = ParcelInfo(0, 0, width, height, SINGLE_CHANNEL);
+        }
 
         LOG_INFO("Version: %s GLSL: %s", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
 
@@ -303,7 +358,7 @@ struct MyGlApp {
     	_lookAtAngles[2] = roll;
     }
 
-    virtual void onDraw() = 0;
+    virtual void onDraw(ParcelInfo channelInfo) = 0;
 
 };
 

@@ -206,7 +206,7 @@ struct CubeApp : public MyGlApp{
   }
 
 
-  virtual void onDraw(){
+  virtual void onDraw(ParcelInfo channelInfo){
 
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -223,11 +223,11 @@ struct CubeApp : public MyGlApp{
 
     glm::quat q1 = glm::angleAxis(_lookAtAngles[1], glm::vec3(0,0,1));
 
-    glm::vec3 eyePos = glm::vec3(0,0,5);
+    // adjust the horizontal distance for IPD too.
+    glm::vec3 eyePos = glm::vec3(channelInfo.getHalfIPDOffsetRatio() ,0,5);
     glm::mat4 view = glm::lookAt( eyePos, eyePos+forwardDir, q1 * glm::vec3(0,1,0) );
 
-    float ratio = (float)ANativeWindow_getWidth(window()) / ANativeWindow_getHeight(window());
-    glm::mat4 proj = glm::perspective( 3.14f / 3.f, ratio, 0.1f,-10.f);
+    glm::mat4 proj = glm::perspective( 3.14f / 3.f, channelInfo.aspectRatio(), 0.1f,-10.f);
 
     glUniformMatrix4fv( viewID, 1, GL_FALSE, glm::value_ptr(view) );
     glUniformMatrix4fv( projectionID, 1, GL_FALSE, glm::value_ptr(proj) );
