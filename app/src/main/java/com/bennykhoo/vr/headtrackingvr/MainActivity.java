@@ -91,7 +91,7 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
         nativeOnPause();
     }
 
-    static final float ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
+    static final float ALPHA = 0.2f; // if ALPHA = 1 OR 0, no filter applies.
 
     static protected float[] LowPass( float[] input, float[] output ) {
         if ( output == null ) return input;

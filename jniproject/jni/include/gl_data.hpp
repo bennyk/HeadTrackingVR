@@ -26,6 +26,7 @@
 #include <stdint.h>
 
 namespace lynda {
+using namespace std;
 
 
 struct Bitmap{
@@ -43,6 +44,7 @@ struct Bitmap{
     //adapted from http://stackoverflow.com/questions/20595340/loading-a-tga-bmp-file-in-c-opengl
     void load(const char* FilePath)
     {
+    	LOG_INFO("reading %s", FilePath);
         std::fstream hFile;
        
         //search for file by going up file directory tree up to 5 times
@@ -53,7 +55,11 @@ struct Bitmap{
             nfilepath = "../" + nfilepath;   
             attempts += 1;
         }
-        if (!hFile.is_open()) throw std::invalid_argument("Error: File Not Found.");
+        if (!hFile.is_open()) {
+        	LOG_ERROR("Throwing exception for: File Not Found.");
+        	throw std::invalid_argument("Error: File Not Found.");
+        }
+
 
         hFile.seekg(0, std::ios::end);
         int Length = hFile.tellg();
@@ -64,12 +70,14 @@ struct Bitmap{
         if(FileInfo[0] != 'B' && FileInfo[1] != 'M')
         {
             hFile.close();
+        	LOG_ERROR("Throwing exception for: Invalid File Format. Bitmap Required.");
             throw std::invalid_argument("Error: Invalid File Format. Bitmap Required.");
         }
 
         if (FileInfo[28] != 24 && FileInfo[28] != 32)
         {
             hFile.close();
+        	LOG_ERROR("Throwing exception for: Invalid File Format. 24 or 32 bit Image Required.");
             throw std::invalid_argument("Error: Invalid File Format. 24 or 32 bit Image Required.");
         }
 
@@ -83,6 +91,7 @@ struct Bitmap{
         hFile.seekg (pixelsOffset, std::ios::beg);
         hFile.read(reinterpret_cast<char*>(pixels.data()), size);
         hFile.close();
+
     }
 
 };

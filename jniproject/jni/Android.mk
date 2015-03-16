@@ -4,7 +4,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := lynda-demo
-LOCAL_CFLAGS    := -Wall -DGL_GLEXT_PROTOTYPES
+LOCAL_CFLAGS    := -Wall -DGL_GLEXT_PROTOTYPES -fexceptions
 
 LOCAL_LDLIBS    := -llog -landroid
 LOCAL_LDLIBS += -lEGL -lGLESv2
