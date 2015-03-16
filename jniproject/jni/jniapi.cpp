@@ -11,6 +11,7 @@
 #include "examples/Model.hpp"
 #include "examples/NullApp.hpp"
 #include "examples/Cube.hpp"
+#include "examples/Texture.hpp"
 
 #define LOG_TAG "jniapi"
 
@@ -22,7 +23,8 @@ JNIEXPORT void JNICALL Java_com_bennykhoo_vr_headtrackingvr_MainActivity_nativeO
     LOG_INFO("nativeOnStart");
 //    myapp = new ModelApp();
 //    myapp = new NullApp();
-    myapp = new cubeapp::CubeApp();
+//    myapp = new cubeapp::CubeApp();
+    myapp = new textureapp::TextureApp();
     return;
 }
 
